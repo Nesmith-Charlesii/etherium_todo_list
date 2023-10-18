@@ -1,7 +1,5 @@
-//This is a json representation of the smart contract created by truffle
 {
   "contractName": "TodoList",
-  // abstract binary interface
   "abi": [
     {
       "constant": true,
@@ -196,9 +194,17 @@
     "name": "solc",
     "version": "0.5.0+commit.1d4f565a.Emscripten.clang"
   },
-  "networks": {},
-  "schemaVersion": "3.0.1",
-  "updatedAt": "2023-10-16T20:36:53.609Z",
+  "networks": {
+    "5777": {
+      "events": {},
+      "links": {},
+      "address": "0xf1b451645d1E0e8ED5618031a029d39BB43d14Be",
+      "transactionHash": "0x1f2dacd2bf0c4a46d02a6022e9cc794d7ff1c8ea7bb5e92da29ab147cf77608b"
+    }
+  },
+  "schemaVersion": "3.4.16",
+  "updatedAt": "2023-10-18T19:44:06.028Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },
