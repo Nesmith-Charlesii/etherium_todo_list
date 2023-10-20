@@ -6,6 +6,7 @@ contract TodoList {
     // uint is an unsigned integer. It cannot be negative
     uint public taskCount = 0;
 
+    // struct is the model of each task
     struct Task {
         uint id;
         string content;
@@ -25,6 +26,6 @@ contract TodoList {
         tasks[taskCount] = Task(taskCount, _content, false);
     }
 
-    
+
 
 }
