@@ -38,26 +38,84 @@ App = {
         else {
             console.log('Non-Ethereum browser detected. You should consider trying MetaMask!')
         }
-  },
+    },
 
-  loadAccount: async () => {
-    App.account = web3.eth.accounts[0]
-    console.log(App.account)
-  },
+    loadAccount: async () => {
+        App.account = web3.eth.accounts[0]
+        console.log(App.account)
+    },
 
-  // This creates a truffle contract - a javascript representation of a smart contract 
-  loadContract: async () => {
-    const todoList = await $.getJSON('TodoList.json')
-    App.contracts.TodoList = TruffleContract(todoList)
-    App.contracts.TodoList.setProvider(window.web3)
+    // This creates a truffle contract - a javascript representation of a smart contract 
+    loadContract: async () => {
+        const todoList = await $.getJSON('TodoList.json')
+        App.contracts.TodoList = TruffleContract(todoList)
+        App.contracts.TodoList.setProvider(window.web3)
+        
+        // Upddate the smart contract with values from the blockchain
+        App.todoList = await App.contracts.TodoList.deployed
+    },
 
-    // Upddate the smart contract with values from the blockchain
-    App.todoList = await App.contracts.TodoList.deployed
-  },
+    render: async () => {
+        // Prevent rendering twice
+        if(App.loading) {
+            return
+        }
+        
+        App.setLoading(true)
 
-  render: async () => {
-    $("#account").html(App.account)
-  }
+        // Render the Account
+        $("#account").html(App.account)
+
+        await App.renderTasks()
+
+        // Update loading state
+        App.setLoading(false)
+    },
+
+  
+    renderTasks: async () => {
+        const taskCount = await App.todoList.taskCount
+        const $taskTemplate = $('.taskTemplate')
+        
+        for(let i = 1; i <= taskCount; i++) {
+            const task = await App.todoList.tasks(i)
+            const taskId = task[0].toNumber()
+            const taskContent = task[1]
+            const taskCompleted = task[2]
+
+            // Create the html for the task
+            const $newTaskTemplate = $taskTemplate.clone()
+            $newTaskTemplate.find('.content').html(taskContent)
+            $newTaskTemplate.find('input')
+                .prop('name', taskId)
+                .prop('checked', taskCompleted)
+                // .on('click', App.toggleCompleted)
+
+            if(taskCompleted) {
+                $('#completedTaskList').append($newTaskTemplate)
+            } else {
+                $('#taskList').append($newTaskTemplate)
+            }
+            
+            $newTaskTemplate.show()
+        }
+    },
+
+    setLoading: (boolean) => {
+        App.loading = boolean
+        const loader = $('#loader')
+        const content = $('#content')
+
+        if(boolean) {
+            loader.show()
+            content.hide()
+        } else {
+            loader.hide()
+            content.show()
+        }
+    },
+
+
 }
 
 $(() => {
