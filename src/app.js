@@ -15,8 +15,15 @@ App = {
 
     // https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
     loadWeb3: async () => {
+        if (typeof web3 !== 'undefined') {
+            App.web3Provider = web3.currentProvider
+            web3 = new Web3(web3.currentProvider)
+          } else {
+            window.alert("Please connect to Metamask.")
+          }
         // Modern dapp browsers...
         if (window.ethereum) {
+            console.log(window.ethereum.isConnected())
             window.web3 = new Web3(ethereum)
             try {
                 // Request account access if needed
@@ -47,12 +54,18 @@ App = {
 
     // This creates a truffle contract - a javascript representation of a smart contract 
     loadContract: async () => {
-        const todoList = await $.getJSON('TodoList.json')
-        App.contracts.TodoList = TruffleContract(todoList)
-        App.contracts.TodoList.setProvider(window.web3)
-        
-        // Upddate the smart contract with values from the blockchain
-        App.todoList = await App.contracts.TodoList.deployed
+        try {
+            const todoList = await $.getJSON('TodoList.json')
+            App.contracts.TodoList = TruffleContract(todoList)
+            console.log(App.contracts.TodoList)
+            App.contracts.TodoList.setProvider(window.web3)
+            
+            // Upddate the smart contract with values from the blockchain
+            App.todoList = await App.contracts.TodoList.deployed
+            console.log('Contract Loaded: ',App.todoList.address)
+        } catch(error) {
+            console.log('Error loading contract: ',error)
+        }
     },
 
     render: async () => {
@@ -70,13 +83,14 @@ App = {
 
         // Update loading state
         App.setLoading(false)
+        
     },
 
   
     renderTasks: async () => {
         const taskCount = await App.todoList.taskCount
         const $taskTemplate = $('.taskTemplate')
-        
+        console.log("task count", taskCount)
         for(let i = 1; i <= taskCount; i++) {
             const task = await App.todoList.tasks(i)
             const taskId = task[0].toNumber()
