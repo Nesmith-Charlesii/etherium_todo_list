@@ -3,10 +3,14 @@
 // metamask communicates to the etherium blockchain with web3.js
 
 App = {
+    contracts: {},
+
     load: async () => {
         // loading the web3 library will connect the app to the blockchain
         await App.loadWeb3()
         await App.loadAccount()
+        await App.loadContract()
+        await App.render()
     },
 
     // https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
@@ -39,6 +43,20 @@ App = {
   loadAccount: async () => {
     App.account = web3.eth.accounts[0]
     console.log(App.account)
+  },
+
+  // This creates a truffle contract - a javascript representation of a smart contract 
+  loadContract: async () => {
+    const todoList = await $.getJSON('TodoList.json')
+    App.contracts.TodoList = TruffleContract(todoList)
+    App.contracts.TodoList.setProvider(window.web3)
+
+    // Upddate the smart contract with values from the blockchain
+    App.todoList = await App.contracts.TodoList.deployed
+  },
+
+  render: async () => {
+    $("#account").html(App.account)
   }
 }
 
